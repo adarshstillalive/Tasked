@@ -2,9 +2,14 @@ import { useState } from "react";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 import { checkEmail, checkName, checkPassword } from "../utils/validator";
+import { userLogin, userSignup } from "../services/authenticationService";
+import { Bounce, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export function Auth() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
+  const [isLoading, setIsLoading] = useState(false);
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
@@ -32,9 +37,31 @@ export function Auth() {
       password: passwordError,
     });
     if (emailError || passwordError) return;
+    try {
+      const response = await userLogin(loginForm);
+      console.log(response.data);
+      localStorage.setItem("userAuthToken", response.data.token);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast("Log in failed, Try again", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async () => {
+    setIsLoading(true);
     const nameError = checkName(signupForm.name);
     const emailError = checkEmail(signupForm.email);
     const passwordError = checkPassword(signupForm.password);
@@ -44,6 +71,27 @@ export function Auth() {
       password: passwordError,
     });
     if (emailError || nameError || passwordError) return;
+    try {
+      const response = await userSignup(signupForm);
+      console.log(response.data);
+      localStorage.setItem("userAuthToken", response.data.token);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast("Sign up failed, Try again", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <div className="w-[400px]">
@@ -78,6 +126,7 @@ export function Auth() {
           loginError={loginError}
           setLoginForm={setLoginForm}
           handleLogin={handleLogin}
+          isLoading={isLoading}
         />
       )}
 
@@ -87,6 +136,7 @@ export function Auth() {
           signupError={signupError}
           setSignupForm={setSignupForm}
           handleSignup={handleSignup}
+          isLoading={isLoading}
         />
       )}
     </div>

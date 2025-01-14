@@ -9,25 +9,27 @@ interface UserWithToken {
   token: string;
 }
 
-class CreateUser {
+class AuthenticateUser {
   constructor(
     private userRepository: UserRepository,
     private bcryptRepositoryInterface: BcryptRepositoryInterface,
     private jwtRepositoryInterface: JwtTokenRepositoryInterface
   ) {}
 
-  async execute(userData: Omit<User, "_id">): Promise<UserWithToken> {
-    const hashedPassword = await this.bcryptRepositoryInterface.hash(
-      userData.password
+  async execute(email: string, password: string): Promise<UserWithToken> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) throw new Error("User not found");
+
+    const isValidPassword = await this.bcryptRepositoryInterface.compare(
+      password,
+      user.password
     );
-    const user = new User(userData.name, userData.email, hashedPassword);
-    const createdUser = await this.userRepository.create(user);
-    if (!createdUser) throw new Error("User creation failed");
+    if (!isValidPassword) throw new Error("Wrong password");
 
     const token = this.jwtRepositoryInterface.generate({ email: user.email });
 
-    return { name: createdUser.name, email: createdUser.email, token };
+    return { name: user.name, email: user.email, token };
   }
 }
 
-export default CreateUser;
+export default AuthenticateUser;
