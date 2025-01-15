@@ -6,7 +6,7 @@ import { userLogin, userSignup } from "../services/authenticationService";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export function Auth() {
+export function LeadAuth() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +74,7 @@ export function Auth() {
     try {
       const response = await userSignup(signupForm);
       console.log(response.data);
-      localStorage.setItem("userAuthToken", response.data.token);
+      localStorage.setItem("leadAuthToken", response.data.token);
       navigate("/");
     } catch (error) {
       console.log(error);
@@ -95,6 +95,7 @@ export function Auth() {
   };
   return (
     <div className="w-[400px]">
+      <h1 className="text-3xl font-bold text-center">Lead</h1>
       <div className="grid w-full grid-cols-2 border-b border-gray-200">
         <button
           className={`py-2 px-4 text-center ${

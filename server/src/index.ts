@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import commonRoute from "./interfaces/routes/commonRoute";
+import userRoute from "./interfaces/routes/userRoute";
+import leadRoute from "./interfaces/routes/leadRoute";
 dotenv.config();
 
 mongoose
@@ -25,7 +26,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", commonRoute);
+app.use("/", userRoute);
+app.use("/lead", leadRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

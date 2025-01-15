@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import { Outlet } from "react-router-dom";
 
-const CommonLayout = () => {
+const UserLayout = () => {
   return (
     <>
       <Header />
@@ -12,4 +12,4 @@ const CommonLayout = () => {
   );
 };
 
-export default CommonLayout;
+export default UserLayout;
