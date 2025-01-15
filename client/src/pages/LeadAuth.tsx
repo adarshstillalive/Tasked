@@ -5,8 +5,10 @@ import { checkEmail, checkName, checkPassword } from "../utils/validator";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { leadLogin, leadSignup } from "../services/leadAuthenticationService";
+import { useUser } from "../context/userContext";
 
 export function LeadAuth() {
+  const { setLead } = useUser();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +42,7 @@ export function LeadAuth() {
     try {
       const response = await leadLogin(loginForm);
       localStorage.setItem("leadAuthToken", response.data.token);
+      setLead({ email: response.data.email, name: response.data.name });
       navigate("/lead");
     } catch (error) {
       console.log(error);
@@ -73,20 +76,11 @@ export function LeadAuth() {
     try {
       const response = await leadSignup(signupForm);
       localStorage.setItem("leadAuthToken", response.data.token);
+      setLead({ email: response.data.email, name: response.data.name });
       navigate("/lead");
     } catch (error) {
       console.log(error);
-      toast("Sign up failed, Try again", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Bounce,
-      });
+      toast.error("Sign up failed, Try again");
     } finally {
       setIsLoading(false);
     }

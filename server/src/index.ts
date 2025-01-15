@@ -6,6 +6,7 @@ import userRoute from "./interfaces/routes/userRoute";
 import leadRoute from "./interfaces/routes/leadRoute";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { addUserSocket, removeUserSocket } from "./utils/socketStore";
 dotenv.config();
 
 mongoose
@@ -40,14 +41,21 @@ app.use("/", userRoute);
 app.use("/lead", leadRoute);
 
 io.on("connection", (socket) => {
-  console.log("user connected");
+  console.log("user connected", socket.id);
+
+  socket.on("register", (email: string) => {
+    addUserSocket(email, socket.id);
+    console.log(`${email} is registered with socket ID ${socket.id}`);
+  });
+
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    removeUserSocket(socket.id);
+    console.log(`Socket ID ${socket.id} disconnected`);
   });
 });
+
+app.set("io", io);
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-export default { io };

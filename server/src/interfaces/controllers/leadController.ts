@@ -10,10 +10,15 @@ import AuthenticateLead from "../../useCases/lead/AuthenticateLead";
 import FetchUsers from "../../useCases/lead/FetchUsers";
 import MongoUserRepository from "../../infrastructure/database/repositories/MongoUserRepository";
 import UserModel from "../../infrastructure/database/models/UserModel";
+import CreateTask from "../../useCases/lead/CreateTask";
+import MongoTaskRepository from "../../infrastructure/database/repositories/MongoTaskRepository";
+import TaskModel from "../../infrastructure/database/models/TaskModel";
+import { getUserSocket } from "../../utils/socketStore";
 
 dotenv.config();
 const leadRepository = new MongoLeadRepository(LeadModel);
 const userRepository = new MongoUserRepository(UserModel);
+const taskRepository = new MongoTaskRepository(TaskModel);
 const bcryptRepository = new BcryptRepository();
 if (!process.env.JWT_SECRET_KEY) throw new Error("Jwt credential missing");
 
@@ -70,8 +75,39 @@ const fetchUsers = async (req: Request, res: Response) => {
   }
 };
 
+const createTask = async (req: Request, res: Response) => {
+  try {
+    const { taskFormData } = req.body;
+    const user = req?.user;
+    if (!user) {
+      throw new Error("Server error");
+    }
+    const createTaskUseCase = new CreateTask(taskRepository);
+    const result = await createTaskUseCase.execute(taskFormData, user);
+    const io = req.app.get("io");
+    const assignedEmail = result.assignTo;
+    const assignedSocketId = getUserSocket(assignedEmail);
+
+    if (io && assignedSocketId) {
+      io.to(assignedSocketId).emit("newTask", {
+        task: result,
+      });
+    }
+
+    res
+      .status(200)
+      .json(createResponse(true, "User data fetching success", result));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(401)
+      .json(createResponse(false, "User data fetching failed", {}, error));
+  }
+};
+
 export default {
   signup,
   login,
   fetchUsers,
+  createTask,
 };

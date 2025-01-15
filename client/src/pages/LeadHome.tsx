@@ -1,6 +1,9 @@
 import AddTaskForm from "../components/AddTaskForm";
+import { useUser } from "../context/userContext";
 
 const LeadHome = () => {
+  const { lead } = useUser();
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* Header */}

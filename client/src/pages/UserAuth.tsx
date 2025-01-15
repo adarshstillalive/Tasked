@@ -5,8 +5,10 @@ import { checkEmail, checkName, checkPassword } from "../utils/validator";
 import { userLogin, userSignup } from "../services/userAuthenticationService";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/userContext";
 
 export function UserAuth() {
+  const { setUser } = useUser();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +42,7 @@ export function UserAuth() {
     try {
       const response = await userLogin(loginForm);
       localStorage.setItem("userAuthToken", response.data.token);
+      setUser({ email: response.data.email, name: response.data.name });
       navigate("/");
     } catch (error) {
       console.log(error);
@@ -73,6 +76,7 @@ export function UserAuth() {
     try {
       const response = await userSignup(signupForm);
       localStorage.setItem("userAuthToken", response.data.token);
+      setUser({ email: response.data.email, name: response.data.name });
       navigate("/");
     } catch (error) {
       console.log(error);
