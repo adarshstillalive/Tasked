@@ -5,7 +5,7 @@ const LeadLayout = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto flex justify-center mt-20">
+      <div className="container justify-center mt-16">
         <Outlet />
       </div>
     </>

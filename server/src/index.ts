@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import userRoute from "./interfaces/routes/userRoute";
 import leadRoute from "./interfaces/routes/leadRoute";
+import { createServer } from "http";
+import { Server } from "socket.io";
 dotenv.config();
 
 mongoose
@@ -14,6 +16,14 @@ mongoose
   .catch((err) => console.log(err));
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    credentials: true,
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  },
+});
 const PORT = process.env.PORT || 8080;
 
 app.use(
@@ -29,6 +39,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", userRoute);
 app.use("/lead", leadRoute);
 
-app.listen(PORT, () => {
+io.on("connection", (socket) => {
+  console.log("user connected");
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+export default { io };

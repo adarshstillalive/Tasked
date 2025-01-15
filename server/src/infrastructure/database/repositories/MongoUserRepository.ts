@@ -21,6 +21,10 @@ class MongoUserRepository implements UserRepository {
     if (!user) return null;
     return new User(user.name, user.email, user.password, user._id.toString());
   }
+
+  async fetchUsers(): Promise<User[]> {
+    return await this.UserModel.find().select("-password");
+  }
 }
 
 export default MongoUserRepository;

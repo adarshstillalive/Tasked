@@ -3,7 +3,7 @@ import userController from "../controllers/userController";
 
 const userRoute = express.Router();
 
-// User
+// Auth
 userRoute.post("/api/signup", userController.signup);
 userRoute.post("/api/login", userController.login);
 

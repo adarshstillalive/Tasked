@@ -1,6 +1,7 @@
 import { Model } from "mongoose";
 import LeadRepository from "../../../domain/repositories/LeadRepository";
 import Lead from "../../../domain/entities/Lead";
+import User from "../../../domain/entities/User";
 
 class MongoLeadRepository implements LeadRepository {
   constructor(private LeadModel: Model<Lead>) {}

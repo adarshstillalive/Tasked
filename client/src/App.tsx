@@ -12,6 +12,7 @@ import UserProtectedRoute from "./routes/protectedRoutes/UserProtectedRoute";
 import LeadProtectedRoute from "./routes/protectedRoutes/LeadProtectedRoute";
 import UserAuthProtectedRoute from "./routes/protectedRoutes/UserAuthProtectedRoute";
 import LeadAuthProtectedRoute from "./routes/protectedRoutes/LeadAuthProtectedRoute";
+import { WebSocketProvider } from "./context/webSocketContext";
 
 function App() {
   const appRoute = createBrowserRouter([
@@ -22,8 +23,9 @@ function App() {
           path: "",
           element: (
             <UserProtectedRoute>
-              {" "}
-              <UserLayout />
+              <WebSocketProvider>
+                <UserLayout />
+              </WebSocketProvider>
             </UserProtectedRoute>
           ),
           children: [
@@ -37,8 +39,9 @@ function App() {
           path: "lead",
           element: (
             <LeadProtectedRoute>
-              {" "}
-              <LeadLayout />
+              <WebSocketProvider>
+                <LeadLayout />
+              </WebSocketProvider>
             </LeadProtectedRoute>
           ),
           children: [
@@ -56,7 +59,6 @@ function App() {
               path: "user",
               element: (
                 <UserAuthProtectedRoute>
-                  {" "}
                   <UserAuth />
                 </UserAuthProtectedRoute>
               ),
@@ -65,7 +67,6 @@ function App() {
               path: "lead",
               element: (
                 <LeadAuthProtectedRoute>
-                  {" "}
                   <LeadAuth />
                 </LeadAuthProtectedRoute>
               ),
