@@ -36,7 +36,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <div className="mb-4">
           <h2 className="text-lg font-bold">Login</h2>
           <p className="text-sm text-gray-600">
-            Make changes to your account here. Click save when you're done.
+            Enter credentials to login and access your account
           </p>
         </div>
         <div>

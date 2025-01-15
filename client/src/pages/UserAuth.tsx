@@ -2,7 +2,7 @@ import { useState } from "react";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 import { checkEmail, checkName, checkPassword } from "../utils/validator";
-import { userLogin, userSignup } from "../services/authenticationService";
+import { userLogin, userSignup } from "../services/userAuthenticationService";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -39,7 +39,6 @@ export function UserAuth() {
     if (emailError || passwordError) return;
     try {
       const response = await userLogin(loginForm);
-      console.log(response.data);
       localStorage.setItem("userAuthToken", response.data.token);
       navigate("/");
     } catch (error) {
@@ -73,7 +72,6 @@ export function UserAuth() {
     if (emailError || nameError || passwordError) return;
     try {
       const response = await userSignup(signupForm);
-      console.log(response.data);
       localStorage.setItem("userAuthToken", response.data.token);
       navigate("/");
     } catch (error) {

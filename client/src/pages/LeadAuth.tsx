@@ -2,9 +2,9 @@ import { useState } from "react";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 import { checkEmail, checkName, checkPassword } from "../utils/validator";
-import { userLogin, userSignup } from "../services/authenticationService";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { leadLogin, leadSignup } from "../services/leadAuthenticationService";
 
 export function LeadAuth() {
   const navigate = useNavigate();
@@ -38,10 +38,9 @@ export function LeadAuth() {
     });
     if (emailError || passwordError) return;
     try {
-      const response = await userLogin(loginForm);
-      console.log(response.data);
-      localStorage.setItem("userAuthToken", response.data.token);
-      navigate("/");
+      const response = await leadLogin(loginForm);
+      localStorage.setItem("leadAuthToken", response.data.token);
+      navigate("/lead");
     } catch (error) {
       console.log(error);
       toast("Log in failed, Try again", {
@@ -72,10 +71,9 @@ export function LeadAuth() {
     });
     if (emailError || nameError || passwordError) return;
     try {
-      const response = await userSignup(signupForm);
-      console.log(response.data);
+      const response = await leadSignup(signupForm);
       localStorage.setItem("leadAuthToken", response.data.token);
-      navigate("/");
+      navigate("/lead");
     } catch (error) {
       console.log(error);
       toast("Sign up failed, Try again", {

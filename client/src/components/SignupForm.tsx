@@ -37,7 +37,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
         <div className="mb-4">
           <h2 className="text-lg font-bold">Signup</h2>
           <p className="text-sm text-gray-600">
-            Change your password here. After saving, you'll be logged out.
+            Enter credentials to create an account.
           </p>
         </div>
         <div>

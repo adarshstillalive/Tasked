@@ -8,6 +8,10 @@ import Home from "./pages/Home";
 import LeadLayout from "./layout/LeadLayout";
 import LeadHome from "./pages/LeadHome";
 import AuthLayout from "./layout/AuthLayout";
+import UserProtectedRoute from "./routes/protectedRoutes/UserProtectedRoute";
+import LeadProtectedRoute from "./routes/protectedRoutes/LeadProtectedRoute";
+import UserAuthProtectedRoute from "./routes/protectedRoutes/UserAuthProtectedRoute";
+import LeadAuthProtectedRoute from "./routes/protectedRoutes/LeadAuthProtectedRoute";
 
 function App() {
   const appRoute = createBrowserRouter([
@@ -16,7 +20,12 @@ function App() {
       children: [
         {
           path: "",
-          element: <UserLayout />,
+          element: (
+            <UserProtectedRoute>
+              {" "}
+              <UserLayout />
+            </UserProtectedRoute>
+          ),
           children: [
             {
               path: "",
@@ -26,7 +35,12 @@ function App() {
         },
         {
           path: "lead",
-          element: <LeadLayout />,
+          element: (
+            <LeadProtectedRoute>
+              {" "}
+              <LeadLayout />
+            </LeadProtectedRoute>
+          ),
           children: [
             {
               path: "",
@@ -40,11 +54,21 @@ function App() {
           children: [
             {
               path: "user",
-              element: <UserAuth />,
+              element: (
+                <UserAuthProtectedRoute>
+                  {" "}
+                  <UserAuth />
+                </UserAuthProtectedRoute>
+              ),
             },
             {
               path: "lead",
-              element: <LeadAuth />,
+              element: (
+                <LeadAuthProtectedRoute>
+                  {" "}
+                  <LeadAuth />
+                </LeadAuthProtectedRoute>
+              ),
             },
           ],
         },

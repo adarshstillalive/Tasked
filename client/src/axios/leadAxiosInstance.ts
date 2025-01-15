@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const userAxiosInstance = axios.create({
+const leadAxiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_SERVER_URL}/lead`,
   withCredentials: true,
 });
 
-userAxiosInstance.interceptors.request.use(async (config) => {
+leadAxiosInstance.interceptors.request.use(async (config) => {
   const token = localStorage.getItem("leadAuthToken");
 
   if (token) {
@@ -15,4 +15,4 @@ userAxiosInstance.interceptors.request.use(async (config) => {
   return config;
 });
 
-export default userAxiosInstance;
+export default leadAxiosInstance;
