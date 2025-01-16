@@ -16,6 +16,7 @@ import TaskModel from "../../infrastructure/database/models/TaskModel";
 import { getUserSocket } from "../../utils/socketStore";
 import FetchTasks from "../../useCases/lead/FetchTasks";
 import DeleteTask from "../../useCases/lead/DeleteTask";
+import UpdateTask from "../../useCases/lead/UpdateTask";
 
 dotenv.config();
 const leadRepository = new MongoLeadRepository(LeadModel);
@@ -118,6 +119,46 @@ const createTask = async (req: Request, res: Response) => {
   }
 };
 
+const updateTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId } = req.params;
+    const { taskFormData } = req.body;
+    const user = req?.user;
+    if (!user) {
+      throw new Error("Server error");
+    }
+    const updateTaskUseCase = new UpdateTask(taskRepository);
+    const result = await updateTaskUseCase.execute(
+      taskId,
+      taskFormData,
+      user.email
+    );
+    const io = req.app.get("io");
+    const assignedEmail = result.assignTo;
+    const leadEmail = result.leadId;
+    const assignedSocketId = getUserSocket(assignedEmail);
+    const leadSocketId = getUserSocket(leadEmail);
+
+    if (io && assignedSocketId) {
+      io.to(assignedSocketId).emit("updateTask", {
+        task: result,
+      });
+    }
+    if (io && leadSocketId) {
+      io.to(leadSocketId).emit("updateTask", {
+        task: result,
+      });
+    }
+
+    res.status(200).json(createResponse(true, "Task updation success", result));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(401)
+      .json(createResponse(false, "Task updation failed", {}, error));
+  }
+};
+
 const fetchTasks = async (req: Request, res: Response) => {
   try {
     const user = req.user;
@@ -177,6 +218,7 @@ export default {
   login,
   fetchUsers,
   createTask,
+  updateTask,
   fetchTasks,
   deleteTask,
 };

@@ -2,23 +2,36 @@ import React, { useState } from "react";
 import { ITask } from "../interfaces/ITask";
 import { deleteTask } from "../services/leadService";
 import { toast } from "react-toastify";
+import EditTaskForm from "./EditTaskForm";
 
 interface TasklistProps {
   tasks: ITask[];
 }
 
 const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<ITask | null>(null);
 
-  const openModal = (task: ITask) => {
+  const openDeleteModal = (task: ITask) => {
     setTaskToDelete(task);
-    setIsModalOpen(true);
+    setIsDeleteModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
     setTaskToDelete(null);
+  };
+
+  const openEditModal = (task: ITask) => {
+    setTaskToEdit(task);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setTaskToEdit(null);
   };
 
   const handleDelete = async () => {
@@ -32,7 +45,7 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
         console.log(error);
         toast.error("Task deletion failed, Try again");
       } finally {
-        closeModal();
+        closeDeleteModal();
       }
     }
   };
@@ -82,13 +95,16 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
                   </span>
                 </td>
                 <td className="border border-gray-300 px-6 py-4 text-sm font-medium">
-                  <button className="text-blue-500 hover:underline">
+                  <button
+                    className="text-blue-500 hover:underline"
+                    onClick={() => openEditModal(task)}
+                  >
                     Edit
                   </button>{" "}
                   |{" "}
                   <button
                     className="text-red-500 hover:underline"
-                    onClick={() => openModal(task)}
+                    onClick={() => openDeleteModal(task)}
                   >
                     Delete
                   </button>
@@ -100,7 +116,7 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
       </div>
 
       {/* Confirmation Modal */}
-      {isModalOpen && (
+      {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -109,7 +125,7 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
             <div className="flex justify-end space-x-4">
               <button
                 className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
-                onClick={closeModal}
+                onClick={closeDeleteModal}
               >
                 Cancel
               </button>
@@ -122,6 +138,10 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {isEditModalOpen && taskToEdit && (
+        <EditTaskForm task={taskToEdit} closeEditModal={closeEditModal} />
       )}
     </div>
   );

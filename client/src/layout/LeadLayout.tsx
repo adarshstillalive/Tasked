@@ -1,7 +1,7 @@
-import Header from "../components/Header";
 import { Outlet } from "react-router-dom";
 import { useUser } from "../context/userContext";
 import useRegisterSocket from "../hooks/useRegisterSocket";
+import HeaderLead from "../components/HeaderLead";
 
 const LeadLayout = () => {
   const { lead } = useUser();
@@ -12,8 +12,8 @@ const LeadLayout = () => {
 
   return (
     <>
-      <Header />
-      <div className="container mx-auto flex justify-center mt-20">
+      <HeaderLead />
+      <div className="container justify-center mt-16">
         <Outlet />
       </div>
     </>

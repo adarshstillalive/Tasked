@@ -7,25 +7,26 @@ interface ITaskFormData {
   assignToName: string;
   assignTo: string;
   endAt: string;
+  status: "pending" | "in-progress" | "completed";
 }
 
-class CreateTask {
+class UpdateTask {
   constructor(private taskRepository: TaskRepository) {}
 
-  async execute(taskFormData: ITaskFormData, leadId: string, leadName: string) {
+  async execute(taskId: string, taskFormData: ITaskFormData, leadId: string) {
+    const fetchTask = await this.taskRepository.findTaskById(taskId);
     const task = new Task(
       taskFormData.title,
       taskFormData.description,
       taskFormData.assignToName,
       taskFormData.assignTo,
       new Date(taskFormData.endAt),
-      leadName,
+      fetchTask.leadName,
       leadId,
-      "pending"
+      taskFormData.status
     );
-    const createdTask = await this.taskRepository.create(task);
-    return createdTask;
+    return await this.taskRepository.updateTask(taskId, task);
   }
 }
 
-export default CreateTask;
+export default UpdateTask;

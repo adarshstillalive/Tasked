@@ -11,6 +11,7 @@ interface TaskRepository {
     status: Task["status"]
   ): Promise<Task>;
   deleteTask(taskId: string, leadId: string): Promise<void>;
+  updateTask(taskId: string, task: Task): Promise<Task>;
 }
 
 export default TaskRepository;

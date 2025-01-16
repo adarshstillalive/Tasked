@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import { IUser } from "../interfaces/IUser";
-import { createTask, fetchUsers } from "../services/leadService";
+import { fetchUsers, updateTask } from "../services/leadService";
 import { toast } from "react-toastify";
+import { ITask } from "../interfaces/ITask";
 
-const AddTaskForm = () => {
+interface EditTaskFormProps {
+  task: ITask;
+  closeEditModal: () => void;
+}
+
+const EditTaskForm: React.FC<EditTaskFormProps> = ({
+  task,
+  closeEditModal,
+}) => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [taskFormData, setTaskFormData] = useState({
-    title: "",
-    description: "",
-    assignToName: "",
-    assignTo: "",
-    endAt: "",
+    title: task.title,
+    description: task.description,
+    assignToName: task.assignToName,
+    assignTo: task.assignTo,
+    endAt: task.endAt.toString(),
+    status: task.status,
   });
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -48,15 +58,18 @@ const AddTaskForm = () => {
         toast.error("End date is required.");
         return;
       }
-      await createTask(taskFormData);
+      if (!task._id) return;
+      await updateTask(task._id, taskFormData);
       setTaskFormData({
         title: "",
         description: "",
         assignToName: "",
         assignTo: "",
         endAt: "",
+        status: task.status,
       });
-      toast("Task added");
+      toast("Task updated");
+      closeEditModal();
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong, Try again.");
@@ -75,9 +88,9 @@ const AddTaskForm = () => {
     getUsers();
   }, []);
   return (
-    <div className="col-span-1">
+    <div className="col-span-1 fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
       <div className="bg-white shadow rounded-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Add Task</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Edit Task</h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -160,6 +173,30 @@ const AddTaskForm = () => {
 
           <div>
             <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              defaultValue={taskFormData.status}
+              onChange={(e) =>
+                setTaskFormData({
+                  ...taskFormData,
+                  status: e.target.value as ITask["status"],
+                })
+              }
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-300 focus:border-blue-500"
+            >
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div>
+            <label
               htmlFor="endAt"
               className="block text-sm font-medium text-gray-700"
             >
@@ -168,7 +205,7 @@ const AddTaskForm = () => {
             <input
               type="date"
               id="endAt"
-              value={taskFormData.endAt}
+              value={new Date(taskFormData.endAt).toISOString().split("T")[0]}
               onChange={(e) =>
                 setTaskFormData({ ...taskFormData, endAt: e.target.value })
               }
@@ -176,12 +213,18 @@ const AddTaskForm = () => {
             />
           </div>
 
-          <div className="text-right">
+          <div className="flex justify-end space-x-4">
             <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+              onClick={closeEditModal}
             >
-              Add Task
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-md"
+              onClick={handleSubmit}
+            >
+              Edit
             </button>
           </div>
         </form>
@@ -190,4 +233,4 @@ const AddTaskForm = () => {
   );
 };
 
-export default AddTaskForm;
+export default EditTaskForm;

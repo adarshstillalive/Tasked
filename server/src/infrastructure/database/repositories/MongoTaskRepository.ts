@@ -109,6 +109,19 @@ class MongoTaskRepository implements TaskRepository {
       throw new Error("Deletion failed");
     }
   }
+
+  async updateTask(taskId: string, task: Task): Promise<Task> {
+    const updatedTask = await this.TaskModel.findByIdAndUpdate(
+      { _id: taskId },
+      { $set: { ...task } },
+      { new: true }
+    );
+
+    if (!updatedTask) {
+      throw new Error("Updation failed");
+    }
+    return updatedTask;
+  }
 }
 
 export default MongoTaskRepository;

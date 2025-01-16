@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWebSocket } from "../context/webSocketContext";
 import { ITask } from "../interfaces/ITask";
 import { fetchTasks } from "../services/userService";
@@ -22,61 +22,75 @@ const Home = () => {
     getTasks();
   }, []);
 
+  // Handle socket events
+  const handleNewTask = useCallback(
+    (data: { task: ITask }) => {
+      setTasks((prev) => {
+        const taskExists = prev.some((t) => t._id === data.task._id);
+        if (!taskExists) {
+          toast(`${data.task.title} added by ${data.task.leadName}`);
+          return [...prev, data.task];
+        }
+        return prev;
+      });
+    },
+    [setTasks]
+  );
+
+  const handleUpdateStatus = useCallback(
+    (data: { task: ITask }) => {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t._id === data.task._id ? { ...t, status: data.task.status } : t
+        )
+      );
+    },
+    [setTasks]
+  );
+
+  const handleDeleteTask = useCallback(
+    (data: { task: ITask }) => {
+      setTasks((prev) => {
+        const updatedTasks = prev.filter((t) => t._id !== data.task._id);
+        toast(`${data.task.title} deleted by ${data.task.leadName}`);
+        return updatedTasks;
+      });
+    },
+    [setTasks]
+  );
+
+  const handleUpdateTask = useCallback(
+    (data: { task: ITask }) => {
+      setTasks((prev) =>
+        prev.map((t) => (t._id === data.task._id ? data.task : t))
+      );
+      toast(`${data.task.title} updated by ${data.task.leadName}`);
+    },
+    [setTasks]
+  );
+
+  // Setup socket listeners
   useEffect(() => {
     if (socket) {
-      socket.on("newTask", (data: { task: ITask }) => {
-        setTasks((prev) => {
-          const taskExists = prev.some((t) => t._id === data.task._id);
-          if (!taskExists) {
-            toast(`${data.task.title} added by ${data.task.leadName}`);
-
-            return [...prev, data.task];
-          }
-          return prev;
-        });
-      });
-      return () => {
-        socket.off("newTask");
-      };
-    }
-  }, [socket]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("updateStatus", (data: { task: ITask }) => {
-        setTasks((prev) => {
-          const updatedTasks = prev.map((t) => {
-            if (t._id === data.task._id) {
-              return { ...t, status: data.task.status };
-            }
-            return t;
-          });
-          return updatedTasks;
-        });
-      });
+      socket.on("newTask", handleNewTask);
+      socket.on("updateStatus", handleUpdateStatus);
+      socket.on("deleteTask", handleDeleteTask);
+      socket.on("updateTask", handleUpdateTask);
 
       return () => {
-        socket.off("updatedStatus");
+        socket.off("newTask", handleNewTask);
+        socket.off("updateStatus", handleUpdateStatus);
+        socket.off("deleteTask", handleDeleteTask);
+        socket.off("updateTask", handleUpdateTask);
       };
     }
-  }, [socket]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("deleteTask", (data: { task: ITask }) => {
-        setTasks((prev) => {
-          const updatedTasks = prev.filter((t) => t._id !== data.task._id);
-          toast(`${data.task.title} deleted by ${data.task.leadName}`);
-
-          return updatedTasks;
-        });
-      });
-
-      return () => {
-        socket.off("deleteTask");
-      };
-    }
-  }, [socket]);
+  }, [
+    socket,
+    handleNewTask,
+    handleUpdateStatus,
+    handleDeleteTask,
+    handleUpdateTask,
+  ]);
 
   return (
     <>

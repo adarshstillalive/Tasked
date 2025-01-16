@@ -73,6 +73,23 @@ const LeadHome = () => {
     }
   }, [socket]);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("updateTask", (data: { task: ITask }) => {
+        setTasks((prev) => {
+          const updatedTasks = prev.map((t) =>
+            t._id === data.task._id ? data.task : t
+          );
+          return updatedTasks;
+        });
+      });
+
+      return () => {
+        socket.off("updateTask");
+      };
+    }
+  }, [socket]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <header className="mb-6">
