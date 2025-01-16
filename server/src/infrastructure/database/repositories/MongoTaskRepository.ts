@@ -38,6 +38,50 @@ class MongoTaskRepository implements TaskRepository {
         )
     );
   }
+
+  async fetchTasksForLead(leadId: string): Promise<Task[]> {
+    const tasks = await this.TaskModel.find({ leadId }).lean();
+    return tasks.map(
+      (task) =>
+        new Task(
+          task.title,
+          task.description,
+          task.assignToName,
+          task.assignTo,
+          task.endAt,
+          task.leadName,
+          task.leadId,
+          task.status,
+          task._id.toString()
+        )
+    );
+  }
+
+  async updateStatusByUser(
+    taskId: string,
+    assignTo: string,
+    status: Task["status"]
+  ): Promise<Task> {
+    const updatedTask = await this.TaskModel.findOneAndUpdate(
+      { _id: taskId, assignTo },
+      { $set: { status } },
+      { new: true }
+    ).lean();
+    if (!updatedTask) {
+      throw new Error("Updation failed");
+    }
+    return new Task(
+      updatedTask.title,
+      updatedTask.description,
+      updatedTask.assignToName,
+      updatedTask.assignTo,
+      updatedTask.endAt,
+      updatedTask.leadName,
+      updatedTask.leadId,
+      updatedTask.status,
+      updatedTask._id.toString()
+    );
+  }
 }
 
 export default MongoTaskRepository;

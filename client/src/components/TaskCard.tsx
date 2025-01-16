@@ -1,44 +1,48 @@
 import React, { useState } from "react";
 import { ITask } from "../interfaces/ITask";
+import { updateStatus } from "../services/userService";
 
 interface TaskCardProps {
   task: ITask;
-  onUpdateStatus: (taskId: string, newStatus: ITask["status"]) => void;
+  bg: string;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdateStatus }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, bg }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<ITask["status"]>(task.status);
 
-  const handleUpdateStatus = () => {
-    onUpdateStatus(task._id!, newStatus); // Assuming `_id` exists for each task
+  const handleUpdateStatus = async () => {
+    if (!task._id) return;
+    try {
+      await updateStatus(task._id, newStatus);
+    } catch (error) {
+      console.log(error);
+    }
     setIsModalOpen(false);
   };
 
   return (
     <>
-      {/* Task Card */}
       <div
-        className="bg-white shadow rounded p-4 cursor-pointer hover:shadow-lg"
+        className={`${bg} shadow rounded p-4 cursor-pointer hover:shadow-lg`}
         onClick={() => setIsModalOpen(true)}
       >
-        <h3 className="text-lg font-semibold text-gray-800">{task.title}</h3>
-        <p className="text-sm text-gray-600">
-          {task.description.slice(0, 80)}
-          {task.description.slice(80) ? "..." : ""}
+        <h3 className="text-lg font-semibold text-white">{task.title}</h3>
+        <p className="text-sm text-white">
+          {task.description.slice(0, 30)}
+          {task.description.slice(30) ? "..." : ""}
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-white">
           Assigned By: <span className="font-medium">{task.leadName}</span>{" "}
           <span title={task.leadId} className="cursor-pointer ">
             ({task.leadId.slice(0, 8)}...)
           </span>
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-white">
           Status: <span className="font-medium capitalize">{task.status}</span>
         </p>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative">
@@ -94,7 +98,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdateStatus }) => {
                 </label>
                 <select
                   id="status"
-                  value={newStatus}
+                  defaultValue={newStatus}
                   onChange={(e) =>
                     setNewStatus(e.target.value as ITask["status"])
                   }

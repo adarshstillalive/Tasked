@@ -14,6 +14,7 @@ import CreateTask from "../../useCases/lead/CreateTask";
 import MongoTaskRepository from "../../infrastructure/database/repositories/MongoTaskRepository";
 import TaskModel from "../../infrastructure/database/models/TaskModel";
 import { getUserSocket } from "../../utils/socketStore";
+import FetchTasks from "../../useCases/lead/FetchTasks";
 
 dotenv.config();
 const leadRepository = new MongoLeadRepository(LeadModel);
@@ -90,10 +91,17 @@ const createTask = async (req: Request, res: Response) => {
     );
     const io = req.app.get("io");
     const assignedEmail = result.assignTo;
+    const leadEmail = result.leadId;
     const assignedSocketId = getUserSocket(assignedEmail);
+    const leadSocketId = getUserSocket(leadEmail);
 
     if (io && assignedSocketId) {
       io.to(assignedSocketId).emit("newTask", {
+        task: result,
+      });
+    }
+    if (io && leadSocketId) {
+      io.to(leadSocketId).emit("newTask", {
         task: result,
       });
     }
@@ -109,9 +117,28 @@ const createTask = async (req: Request, res: Response) => {
   }
 };
 
+const fetchTasks = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("Server error");
+    }
+
+    const fetchTasksUseCase = new FetchTasks(taskRepository);
+    const result = await fetchTasksUseCase.execute(user.email);
+    res.status(200).json(createResponse(true, "Fetching task success", result));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(401)
+      .json(createResponse(false, "Fetching tasks failed", {}, error));
+  }
+};
+
 export default {
   signup,
   login,
   fetchUsers,
   createTask,
+  fetchTasks,
 };

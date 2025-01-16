@@ -13,5 +13,6 @@ leadRoute.get("/api/users", leadAuthMiddleware.auth, leadController.fetchUsers);
 
 // Task
 leadRoute.post("/api/task", leadAuthMiddleware.auth, leadController.createTask);
+leadRoute.get("/api/tasks", leadAuthMiddleware.auth, leadController.fetchTasks);
 
 export default leadRoute;

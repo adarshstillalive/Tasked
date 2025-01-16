@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { useWebSocket } from "../context/webSocketContext";
-import { useUser } from "../context/userContext";
 import { ITask } from "../interfaces/ITask";
 import { fetchTasks } from "../services/userService";
 import TaskCard from "../components/TaskCard";
+import { toast } from "react-toastify";
 
 const Home = () => {
   const socket = useWebSocket();
   const [tasks, setTasks] = useState<ITask[]>([]);
 
-  const opUpdateStatus = async (taskId: string, newStatus: ITask["status"]) => {
-    console.log(taskId, newStatus);
-  };
-
   useEffect(() => {
     const getTasks = async () => {
       try {
         const response = await fetchTasks();
-        console.log(response.data);
 
         setTasks(response.data);
       } catch (error) {
@@ -26,6 +21,44 @@ const Home = () => {
     };
     getTasks();
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newTask", (data: { task: ITask }) => {
+        setTasks((prev) => {
+          const taskExists = prev.some((t) => t._id === data.task._id);
+          if (!taskExists) {
+            toast(`New task added by: ${data.task.leadName}`);
+            return [...prev, data.task];
+          }
+          return prev;
+        });
+      });
+      return () => {
+        socket.off("newTask");
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("updateStatus", (data: { task: ITask }) => {
+        setTasks((prev) => {
+          const updatedTasks = prev.map((t) => {
+            if (t._id === data.task._id) {
+              return { ...t, status: data.task.status };
+            }
+            return t;
+          });
+          return updatedTasks;
+        });
+      });
+
+      return () => {
+        socket.off("updatedStatus");
+      };
+    }
+  }, [socket]);
 
   return (
     <>
@@ -46,13 +79,24 @@ const Home = () => {
                   .filter(
                     (task) => task.status.toLowerCase() === status.toLowerCase()
                   )
-                  .map((task) => (
-                    <TaskCard
-                      key={task._id}
-                      task={task}
-                      onUpdateStatus={opUpdateStatus}
-                    />
-                  ))}
+                  .map((task) => {
+                    let bgColor = "";
+                    switch (status) {
+                      case "Pending":
+                        bgColor = "bg-red-500";
+                        break;
+                      case "In-Progress":
+                        bgColor = "bg-yellow-500";
+                        break;
+                      case "Completed":
+                        bgColor = "bg-green-500";
+                        break;
+                      default:
+                        bgColor = "bg-white";
+                        break;
+                    }
+                    return <TaskCard key={task._id} task={task} bg={bgColor} />;
+                  })}
               </div>
               {tasks.filter(
                 (task) => task.status.toLowerCase() === status.toLowerCase()

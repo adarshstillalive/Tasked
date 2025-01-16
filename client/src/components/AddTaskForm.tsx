@@ -130,6 +130,7 @@ const AddTaskForm = () => {
             </label>
             <select
               id="assignTo"
+              value={taskFormData.assignTo}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
               style={{ maxHeight: "200px" }}
               onChange={(e) => {
@@ -147,7 +148,7 @@ const AddTaskForm = () => {
                 }
               }}
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Select user
               </option>
               {users.map((user) => (

@@ -10,5 +10,9 @@ userRoute.post("/api/login", userController.login);
 
 // Task
 userRoute.get("/api/tasks", userAuthMiddleware.auth, userController.fetchTasks);
-
+userRoute.patch(
+  "/api/task/:taskId",
+  userAuthMiddleware.auth,
+  userController.updateStatus
+);
 export default userRoute;

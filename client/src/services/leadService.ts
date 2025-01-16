@@ -19,3 +19,8 @@ export const createTask = async (
   const response = await leadAxiosInstance.post("/api/task", { taskFormData });
   return response.data;
 };
+
+export const fetchTasks = async (): Promise<ApiResponse> => {
+  const response = await leadAxiosInstance.get("/api/tasks");
+  return response.data;
+};
