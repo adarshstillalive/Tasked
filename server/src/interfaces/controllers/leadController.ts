@@ -83,7 +83,11 @@ const createTask = async (req: Request, res: Response) => {
       throw new Error("Server error");
     }
     const createTaskUseCase = new CreateTask(taskRepository);
-    const result = await createTaskUseCase.execute(taskFormData, user);
+    const result = await createTaskUseCase.execute(
+      taskFormData,
+      user.email,
+      user.name
+    );
     const io = req.app.get("io");
     const assignedEmail = result.assignTo;
     const assignedSocketId = getUserSocket(assignedEmail);

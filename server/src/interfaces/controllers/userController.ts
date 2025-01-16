@@ -7,9 +7,13 @@ import CreateUser from "../../useCases/user/CreateUser";
 import JwtTokenRepository from "../../infrastructure/security/JwtTokenRepository";
 import dotenv from "dotenv";
 import AuthenticateUser from "../../useCases/user/AuthenticateUser";
+import FetchTasks from "../../useCases/user/FetchTasks";
+import MongoTaskRepository from "../../infrastructure/database/repositories/MongoTaskRepository";
+import TaskModel from "../../infrastructure/database/models/TaskModel";
 
 dotenv.config();
 const userRepository = new MongoUserRepository(UserModel);
+const taskRepository = new MongoTaskRepository(TaskModel);
 const bcryptRepository = new BcryptRepository();
 if (!process.env.JWT_SECRET_KEY) throw new Error("Jwt credential missing");
 
@@ -51,7 +55,26 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+const fetchTasks = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("Server error");
+    }
+
+    const fetchTasksUseCase = new FetchTasks(taskRepository);
+    const result = await fetchTasksUseCase.execute(user.email);
+    res.status(200).json(createResponse(true, "Fetching task success", result));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(401)
+      .json(createResponse(false, "Fetching tasks failed", {}, error));
+  }
+};
+
 export default {
   signup,
   login,
+  fetchTasks,
 };

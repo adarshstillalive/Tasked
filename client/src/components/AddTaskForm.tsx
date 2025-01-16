@@ -8,6 +8,7 @@ const AddTaskForm = () => {
   const [taskFormData, setTaskFormData] = useState({
     title: "",
     description: "",
+    assignToName: "",
     assignTo: "",
     endDate: "",
   });
@@ -49,6 +50,14 @@ const AddTaskForm = () => {
       }
       console.log(taskFormData);
       await createTask(taskFormData);
+      setTaskFormData({
+        title: "",
+        description: "",
+        assignToName: "",
+        assignTo: "",
+        endDate: "",
+      });
+      toast("Task added");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong, Try again.");
@@ -123,16 +132,27 @@ const AddTaskForm = () => {
               id="assignTo"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
               style={{ maxHeight: "200px" }}
-              onChange={(e) =>
-                setTaskFormData({ ...taskFormData, assignTo: e.target.value })
-              }
+              onChange={(e) => {
+                const selectedEmail = e.target.value;
+                const selectedUser = users.find(
+                  (user) => user.email === selectedEmail
+                );
+
+                if (selectedUser) {
+                  setTaskFormData({
+                    ...taskFormData,
+                    assignTo: selectedUser.email,
+                    assignToName: selectedUser.name,
+                  });
+                }
+              }}
             >
               <option value="" disabled selected>
                 Select user
               </option>
               {users.map((user) => (
                 <option key={user._id} value={user.email}>
-                  {user.name}
+                  {user.name} ({user.email})
                 </option>
               ))}
             </select>

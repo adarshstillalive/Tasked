@@ -4,6 +4,7 @@ import TaskRepository from "../../domain/repositories/TaskRepository";
 interface ITaskFormData {
   title: string;
   description: string;
+  assignToName: string;
   assignTo: string;
   endDate: string;
 }
@@ -11,12 +12,14 @@ interface ITaskFormData {
 class CreateTask {
   constructor(private taskRepository: TaskRepository) {}
 
-  async execute(taskFormData: ITaskFormData, leadId: string) {
+  async execute(taskFormData: ITaskFormData, leadId: string, leadName: string) {
     const task = new Task(
       taskFormData.title,
       taskFormData.description,
+      taskFormData.assignToName,
       taskFormData.assignTo,
       new Date(taskFormData.endDate),
+      leadName,
       leadId,
       "pending"
     );

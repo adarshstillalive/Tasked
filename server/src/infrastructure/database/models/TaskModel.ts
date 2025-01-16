@@ -10,12 +10,20 @@ const taskSchema = new mongoose.Schema<Task>({
     type: String,
     required: true,
   },
+  assignToName: {
+    type: String,
+    required: true,
+  },
   assignTo: {
     type: String,
     required: true,
   },
   endAt: {
     type: Date,
+    required: true,
+  },
+  leadName: {
+    type: String,
     required: true,
   },
   leadId: {

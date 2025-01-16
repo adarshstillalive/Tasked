@@ -12,10 +12,30 @@ class MongoTaskRepository implements TaskRepository {
     return new Task(
       createdTask.title,
       createdTask.description,
+      createdTask.assignToName,
       createdTask.assignTo,
       createdTask.endAt,
+      createdTask.leadName,
       createdTask.leadId,
       createdTask.status
+    );
+  }
+
+  async fetchTasksForUser(assignTo: string): Promise<Task[]> {
+    const tasks = await this.TaskModel.find({ assignTo }).lean();
+    return tasks.map(
+      (task) =>
+        new Task(
+          task.title,
+          task.description,
+          task.assignToName,
+          task.assignTo,
+          task.endAt,
+          task.leadName,
+          task.leadId,
+          task.status,
+          task._id.toString()
+        )
     );
   }
 }
