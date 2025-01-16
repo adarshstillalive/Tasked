@@ -24,85 +24,103 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, bg }) => {
   return (
     <>
       <div
-        className={`${bg} shadow rounded p-4 cursor-pointer hover:shadow-lg`}
+        className={`${bg} rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 p-5 cursor-pointer`}
         onClick={() => setIsModalOpen(true)}
       >
-        <h3 className="text-lg font-semibold text-white">{task.title}</h3>
-        <p className="text-sm text-white">
-          {task.description.slice(0, 30)}
-          {task.description.slice(30) ? "..." : ""}
-        </p>
-        <p className="text-sm text-white">
-          Assigned By: <span className="font-medium">{task.leadName}</span>{" "}
-          <span title={task.leadId} className="cursor-pointer ">
-            ({task.leadId.slice(0, 8)}...)
-          </span>
-        </p>
-        <p className="text-sm text-white">
-          Status: <span className="font-medium capitalize">{task.status}</span>
-        </p>
+        <div className="space-y-3">
+          <h3 className="text-xl font-bold text-white leading-tight">
+            {task.title}
+          </h3>
+
+          <p className="text-white/90 text-sm line-clamp-2">
+            {task.description.slice(0, 30)}
+            {task.description.slice(30) ? "..." : ""}
+          </p>
+
+          <div className="pt-2 border-t border-white/20">
+            <div className="flex items-center gap-2 text-sm text-white/90">
+              <span className="font-medium">Lead:</span>
+              <span>{task.leadName}</span>
+              <span title={task.leadId} className="text-white/70 text-xs">
+                ({task.leadId.slice(0, 8)}...)
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-2 text-sm">
+              <span className="px-2 py-1 bg-white/20 rounded-full text-white">
+                {task.status}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative animate-fade-in">
             <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
               onClick={() => setIsModalOpen(false)}
             >
-              &times;
+              ×
             </button>
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
               Task Details
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-600">
                   Title
                 </label>
-                <p className="text-gray-800">{task.title}</p>
+                <p className="mt-1 text-gray-900 font-medium">{task.title}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-600">
                   Description
                 </label>
-                <p className="text-gray-800">{task.description}</p>
+                <p className="mt-1 text-gray-800 text-sm">{task.description}</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Assigned To
-                </label>
-                <p className="text-gray-800">
-                  {task.assignToName} ({task.assignTo})
-                </p>
-              </div>
+              <div className="flex gap-6">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-600">
+                    Assigned To
+                  </label>
+                  <p className="mt-1 text-gray-800">
+                    {task.assignToName}
+                    <span className="text-gray-500 text-sm ml-1">
+                      ({task.assignTo})
+                    </span>
+                  </p>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  End Date
-                </label>
-                <p className="text-gray-800">
-                  {new Date(task.endAt).toLocaleDateString()}
-                </p>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Due Date
+                  </label>
+                  <p className="mt-1 text-gray-800">
+                    {new Date(task.endAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
 
               <div>
                 <label
                   htmlFor="status"
-                  className="block text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-600"
                 >
                   Status
                 </label>
                 <select
                   id="status"
-                  defaultValue={newStatus}
+                  value={newStatus}
                   onChange={(e) =>
                     setNewStatus(e.target.value as ITask["status"])
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-300 focus:border-blue-500"
+                  className="mt-1 w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
@@ -111,18 +129,21 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, bg }) => {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            <div className="mt-8 flex justify-end gap-3">
               <button
-                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded hover:bg-gray-300"
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700"
-                onClick={handleUpdateStatus}
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={() => {
+                  handleUpdateStatus();
+                  setIsModalOpen(false);
+                }}
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>

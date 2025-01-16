@@ -51,9 +51,7 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Task List</h2>
-
+    <div className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-200">
           <thead className="bg-gray-100 ">

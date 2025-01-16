@@ -75,118 +75,109 @@ const AddTaskForm = () => {
     getUsers();
   }, []);
   return (
-    <div className="col-span-1">
-      <div className="bg-white shadow rounded-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Add Task</h2>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <div className="text-sm font-semibold text-gray-700">Title</div>
+        <div className="relative">
+          <input
+            type="text"
+            value={taskFormData.title}
+            onChange={(e) =>
+              setTaskFormData({ ...taskFormData, title: e.target.value })
+            }
+            placeholder="Enter task title"
+            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="taskTitle"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Title
-            </label>
-            <input
-              type="text"
-              id="taskTitle"
-              value={taskFormData.title}
-              onChange={(e) =>
-                setTaskFormData({ ...taskFormData, title: e.target.value })
-              }
-              placeholder="Enter task title"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
-            />
-          </div>
+      <div className="space-y-2">
+        <div className="text-sm font-semibold text-gray-700">Description</div>
+        <div className="relative">
+          <textarea
+            value={taskFormData.description}
+            onChange={(e) =>
+              setTaskFormData({
+                ...taskFormData,
+                description: e.target.value,
+              })
+            }
+            placeholder="Enter task description"
+            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all min-h-[120px] resize-none"
+          />
+        </div>
+      </div>
 
-          <div>
-            <label
-              htmlFor="taskDescription"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <textarea
-              id="taskDescription"
-              value={taskFormData.description}
-              onChange={(e) =>
+      <div className="space-y-2">
+        <div className="text-sm font-semibold text-gray-700">Assign To</div>
+        <div className="relative">
+          <select
+            value={taskFormData.assignTo}
+            onChange={(e) => {
+              const selectedEmail = e.target.value;
+              const selectedUser = users.find(
+                (user) => user.email === selectedEmail
+              );
+              if (selectedUser) {
                 setTaskFormData({
                   ...taskFormData,
-                  description: e.target.value,
-                })
+                  assignTo: selectedUser.email,
+                  assignToName: selectedUser.name,
+                });
               }
-              placeholder="Enter task description"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
-            ></textarea>
-          </div>
-
-          <div>
-            <label
-              htmlFor="assignTo"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Assign To
-            </label>
-            <select
-              id="assignTo"
-              value={taskFormData.assignTo}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
-              style={{ maxHeight: "200px" }}
-              onChange={(e) => {
-                const selectedEmail = e.target.value;
-                const selectedUser = users.find(
-                  (user) => user.email === selectedEmail
-                );
-
-                if (selectedUser) {
-                  setTaskFormData({
-                    ...taskFormData,
-                    assignTo: selectedUser.email,
-                    assignToName: selectedUser.name,
-                  });
-                }
-              }}
-            >
-              <option value="" disabled>
-                Select user
+            }}
+            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none"
+          >
+            <option value="" disabled>
+              Select user
+            </option>
+            {users.map((user) => (
+              <option key={user._id} value={user.email}>
+                {user.name} ({user.email})
               </option>
-              {users.map((user) => (
-                <option key={user._id} value={user.email}>
-                  {user.name} ({user.email})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="endAt"
-              className="block text-sm font-medium text-gray-700"
+            ))}
+          </select>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              End Date
-            </label>
-            <input
-              type="date"
-              id="endAt"
-              value={taskFormData.endAt}
-              onChange={(e) =>
-                setTaskFormData({ ...taskFormData, endAt: e.target.value })
-              }
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring focus:ring-blue-300 focus:border-blue-500"
-            />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
-
-          <div className="text-right">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700"
-            >
-              Add Task
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+
+      <div className="space-y-2">
+        <div className="text-sm font-semibold text-gray-700">End Date</div>
+        <div className="relative">
+          <input
+            type="date"
+            value={taskFormData.endAt}
+            onChange={(e) =>
+              setTaskFormData({ ...taskFormData, endAt: e.target.value })
+            }
+            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all active:scale-95"
+        >
+          Add Task
+        </button>
+      </div>
+    </form>
   );
 };
 

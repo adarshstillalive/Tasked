@@ -13,7 +13,7 @@ const LeadLayout = () => {
   return (
     <>
       <HeaderLead />
-      <div className="container justify-center mt-16">
+      <div className="mt-16">
         <Outlet />
       </div>
     </>
