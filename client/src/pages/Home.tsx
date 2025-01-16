@@ -28,7 +28,8 @@ const Home = () => {
         setTasks((prev) => {
           const taskExists = prev.some((t) => t._id === data.task._id);
           if (!taskExists) {
-            toast(`New task added by: ${data.task.leadName}`);
+            toast(`${data.task.title} added by ${data.task.leadName}`);
+
             return [...prev, data.task];
           }
           return prev;
@@ -60,6 +61,23 @@ const Home = () => {
     }
   }, [socket]);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("deleteTask", (data: { task: ITask }) => {
+        setTasks((prev) => {
+          const updatedTasks = prev.filter((t) => t._id !== data.task._id);
+          toast(`${data.task.title} deleted by ${data.task.leadName}`);
+
+          return updatedTasks;
+        });
+      });
+
+      return () => {
+        socket.off("deleteTask");
+      };
+    }
+  }, [socket]);
+
   return (
     <>
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -69,8 +87,8 @@ const Home = () => {
           </h1>
 
           {/* Task Categories */}
-          {["Pending", "In-Progress", "Completed"].map((status) => (
-            <div key={status} className="mb-16">
+          {["Pending", "In-Progress", "Completed"].map((status, index) => (
+            <div key={index} className="mb-16">
               <h2 className="text-2xl font-bold text-gray-700 mb-6">
                 {status} Tasks
               </h2>

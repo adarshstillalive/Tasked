@@ -48,7 +48,6 @@ const AddTaskForm = () => {
         toast.error("End date is required.");
         return;
       }
-      console.log(taskFormData);
       await createTask(taskFormData);
       setTaskFormData({
         title: "",

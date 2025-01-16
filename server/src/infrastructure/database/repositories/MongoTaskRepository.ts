@@ -17,7 +17,27 @@ class MongoTaskRepository implements TaskRepository {
       createdTask.endAt,
       createdTask.leadName,
       createdTask.leadId,
-      createdTask.status
+      createdTask.status,
+      createdTask._id
+    );
+  }
+
+  async findTaskById(taskId: string): Promise<Task> {
+    const task = await this.TaskModel.findById(taskId);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    return new Task(
+      task.title,
+      task.description,
+      task.assignToName,
+      task.assignTo,
+      task.endAt,
+      task.leadName,
+      task.leadId,
+      task.status,
+      task._id.toString()
     );
   }
 
@@ -81,6 +101,13 @@ class MongoTaskRepository implements TaskRepository {
       updatedTask.status,
       updatedTask._id.toString()
     );
+  }
+
+  async deleteTask(taskId: string, leadId: string): Promise<void> {
+    const deletedTask = await this.TaskModel.deleteOne({ _id: taskId, leadId });
+    if (deletedTask.deletedCount <= 0) {
+      throw new Error("Deletion failed");
+    }
   }
 }
 

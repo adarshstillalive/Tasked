@@ -15,6 +15,7 @@ import MongoTaskRepository from "../../infrastructure/database/repositories/Mong
 import TaskModel from "../../infrastructure/database/models/TaskModel";
 import { getUserSocket } from "../../utils/socketStore";
 import FetchTasks from "../../useCases/lead/FetchTasks";
+import DeleteTask from "../../useCases/lead/DeleteTask";
 
 dotenv.config();
 const leadRepository = new MongoLeadRepository(LeadModel);
@@ -135,10 +136,47 @@ const fetchTasks = async (req: Request, res: Response) => {
   }
 };
 
+const deleteTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId } = req.params;
+    const user = req.user;
+    if (!user) {
+      throw new Error("Server error");
+    }
+
+    const deleteTaskUseCase = new DeleteTask(taskRepository);
+    const result = await deleteTaskUseCase.execute(taskId, user.email);
+
+    const io = req.app.get("io");
+    const assignedEmail = result.assignTo;
+    const leadEmail = result.leadId;
+    const assignedSocketId = getUserSocket(assignedEmail);
+    const leadSocketId = getUserSocket(leadEmail);
+
+    if (io && assignedSocketId) {
+      io.to(assignedSocketId).emit("deleteTask", {
+        task: result,
+      });
+    }
+    if (io && leadSocketId) {
+      io.to(leadSocketId).emit("deleteTask", {
+        task: result,
+      });
+    }
+    res.status(200).json(createResponse(true, "Task deleted successfully"));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(401)
+      .json(createResponse(false, "task deletion failed", {}, error));
+  }
+};
+
 export default {
   signup,
   login,
   fetchUsers,
   createTask,
   fetchTasks,
+  deleteTask,
 };

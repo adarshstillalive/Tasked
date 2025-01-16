@@ -24,9 +24,14 @@ const LeadHome = () => {
   useEffect(() => {
     if (socket) {
       socket.on("newTask", (data: { task: ITask }) => {
-        setTasks((prev) => [...prev, data.task]);
+        setTasks((prev) => {
+          const taskExists = prev.some((t) => t._id === data.task._id);
+          if (!taskExists) {
+            return [...prev, data.task];
+          }
+          return prev;
+        });
       });
-
       return () => {
         socket.off("newTask");
       };
@@ -49,6 +54,21 @@ const LeadHome = () => {
 
       return () => {
         socket.off("updateStatus");
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("deleteTask", (data: { task: ITask }) => {
+        setTasks((prev) => {
+          const updatedTasks = prev.filter((t) => t._id !== data.task._id);
+          return updatedTasks;
+        });
+      });
+
+      return () => {
+        socket.off("deleteTask");
       };
     }
   }, [socket]);

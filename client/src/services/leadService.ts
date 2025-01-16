@@ -20,6 +20,11 @@ export const createTask = async (
   return response.data;
 };
 
+export const deleteTask = async (taskId: string): Promise<ApiResponse> => {
+  const response = await leadAxiosInstance.delete(`/api/task/${taskId}`);
+  return response.data;
+};
+
 export const fetchTasks = async (): Promise<ApiResponse> => {
   const response = await leadAxiosInstance.get("/api/tasks");
   return response.data;

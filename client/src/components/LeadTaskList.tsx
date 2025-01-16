@@ -1,10 +1,42 @@
+import React, { useState } from "react";
 import { ITask } from "../interfaces/ITask";
+import { deleteTask } from "../services/leadService";
+import { toast } from "react-toastify";
 
 interface TasklistProps {
   tasks: ITask[];
 }
 
 const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
+
+  const openModal = (task: ITask) => {
+    setTaskToDelete(task);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTaskToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    console.log(taskToDelete);
+
+    if (taskToDelete && taskToDelete._id) {
+      try {
+        await deleteTask(taskToDelete._id);
+        toast("Task deleted");
+      } catch (error) {
+        console.log(error);
+        toast.error("Task deletion failed, Try again");
+      } finally {
+        closeModal();
+      }
+    }
+  };
+
   return (
     <div className="bg-white shadow-lg rounded-lg p-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Task List</h2>
@@ -12,11 +44,11 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-200">
           <thead className="bg-gray-100 ">
-            <tr className="">
+            <tr>
               <th className="border border-gray-300 px-6 py-3 text-sm font-medium text-gray-600">
                 Task
               </th>
-              <th className="border  border-gray-300 px-6 py-3 text-sm font-medium text-gray-600">
+              <th className="border border-gray-300 px-6 py-3 text-sm font-medium text-gray-600">
                 Assigned To
               </th>
               <th className="border border-gray-300 px-6 py-3 text-sm font-medium text-gray-600">
@@ -28,8 +60,8 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task) => (
-              <tr key={task._id} className="hover:bg-gray-50 text-center">
+            {tasks.map((task, index) => (
+              <tr key={index} className="hover:bg-gray-50 text-center">
                 <td className="border border-gray-300 px-6 py-4 text-sm font-medium text-gray-800">
                   {task.title}
                 </td>
@@ -54,7 +86,10 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
                     Edit
                   </button>{" "}
                   |{" "}
-                  <button className="text-red-500 hover:underline">
+                  <button
+                    className="text-red-500 hover:underline"
+                    onClick={() => openModal(task)}
+                  >
                     Delete
                   </button>
                 </td>
@@ -63,6 +98,31 @@ const LeadTaskList: React.FC<TasklistProps> = ({ tasks }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Are you sure, you want to delete this task?
+            </h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded-md"
+                onClick={handleDelete}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
