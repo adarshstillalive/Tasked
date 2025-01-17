@@ -81,18 +81,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, bg }) => {
                 <label className="text-sm font-medium text-gray-600">
                   Description
                 </label>
-                <p className="mt-1 text-gray-800 text-sm">{task.description}</p>
+                <p className="mt-1 text-gray-800 text-sm max-h-24 overflow-y-auto">
+                  {task.description}
+                </p>
               </div>
 
               <div className="flex gap-6">
                 <div className="flex-1">
                   <label className="text-sm font-medium text-gray-600">
-                    Assigned To
+                    Assigned By
                   </label>
                   <p className="mt-1 text-gray-800">
-                    {task.assignToName}
+                    {task.leadName}
                     <span className="text-gray-500 text-sm ml-1">
-                      ({task.assignTo})
+                      ({task.leadId})
                     </span>
                   </p>
                 </div>
