@@ -1,7 +1,7 @@
 # Tasked. : A Task Management Application
 
 ## Project Overview
-The Task Management Application is a full-stack web application that allows users to manage tasks effectively. It includes features such as task creation, editing, and deletion, user authentication, real-time updates, data visualization, and responsive design.
+The Task Management Application is a full-stack web application which is in clean architecture that allows users to manage tasks effectively. It includes features such as task creation, editing, and deletion, user authentication, real-time updates, data visualization, and responsive design.
 
 ---
 
