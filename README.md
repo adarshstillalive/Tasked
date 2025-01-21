@@ -61,7 +61,7 @@ The Task Management Application is a full-stack web application which is in clea
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/adarshstillalive/Tasked..git
+   git clone https://github.com/adarshstillalive/Tasked.git
    cd Tasked.
 
 
